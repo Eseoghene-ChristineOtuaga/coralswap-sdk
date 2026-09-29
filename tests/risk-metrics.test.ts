@@ -238,6 +238,21 @@ describe('RiskMetricsModule', () => {
       });
     });
 
+    it('rejects non-positive volatility windows', async () => {
+      const positions = [makePosition()];
+      jest.spyOn(client.portfolio, 'get').mockResolvedValue(
+        makePortfolio(positions)
+      );
+
+      await expect(
+        riskMetrics.getPortfolioRisk(USER, { volatilityWindowDays: 0 })
+      ).rejects.toThrow(ValidationError);
+
+      await expect(
+        riskMetrics.getPortfolioRisk(USER, { volatilityWindowDays: -5 })
+      ).rejects.toThrow(ValidationError);
+    });
+
     it('respects volatility window option', async () => {
       const positions = [makePosition()];
       jest.spyOn(client.portfolio, 'get').mockResolvedValue(
