@@ -1,4 +1,5 @@
 import { CoralSwapClient } from '@/client';
+import { ValidationError } from '@/errors';
 import {
   PortfolioRisk,
   RiskFactor,
@@ -55,6 +56,17 @@ export class RiskMetricsModule {
     validateAddress(address, 'address');
 
     const volatilityWindowDays = options.volatilityWindowDays ?? 30;
+    if (
+      !Number.isInteger(volatilityWindowDays) ||
+      !Number.isFinite(volatilityWindowDays) ||
+      volatilityWindowDays <= 0
+    ) {
+      throw new ValidationError(
+        'options.volatilityWindowDays must be a positive integer',
+        { volatilityWindowDays },
+      );
+    }
+
     const portfolio = await this.client.portfolio.get(address, {
       pairAddresses: options.pairAddresses,
     });
